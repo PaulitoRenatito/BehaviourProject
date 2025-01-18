@@ -5,7 +5,7 @@ namespace Behaviour.Nodes
 {
     public class Delay : Node
     {
-        private Timer timer;
+        private readonly Timer timer;
         private Status status;
         
         private int counter = 0;
@@ -13,7 +13,6 @@ namespace Behaviour.Nodes
         public Delay(string name, int priority = 0, float time = 0) : base(name, priority)
         {
             this.timer = new CountdownTimer(time);
-
             
             timer.OnTimerStart += () =>
             {

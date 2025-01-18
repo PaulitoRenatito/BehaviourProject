@@ -20,25 +20,25 @@ namespace Behaviour.Strategies
             this.agent = agent;
             this.patrolPoints = patrolPoints;
             this.patrolSpeed = patrolSpeed;
+            this.agent.speed = patrolSpeed;
         }
 
         public Node.Status Process()
         {
             if (currentIndex == patrolPoints.Count) return Node.Status.Success;
-            
-            Transform target = patrolPoints[currentIndex];
-            agent.SetDestination(target.position);
-            entity.LookAt(target);
 
-            if (isPathCalculated && agent.remainingDistance < 0.1f)
+            Transform target = patrolPoints[currentIndex];
+
+            if (!isPathCalculated)
+            {
+                agent.SetDestination(target.position);
+                isPathCalculated = true;
+            }
+    
+            if (!agent.pathPending && agent.remainingDistance < 0.1f)
             {
                 currentIndex++;
                 isPathCalculated = false;
-            }
-
-            if (agent.pathPending)
-            {
-                isPathCalculated = true;
             }
 
             return Node.Status.Running;
