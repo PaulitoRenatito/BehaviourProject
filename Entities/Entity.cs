@@ -1,76 +1,96 @@
+using Animations;
 using Behaviour;
 using Behaviour.Nodes;
 using Behaviour.Strategies;
+using Sensor.SensorTypes;
+using Tasks;
 using UnityEngine;
-using Utilities;
+using UnityEngine.AI;
 
-public class Entity : MonoBehaviour
+namespace Entities
 {
-    
-    [SerializeField] int health = 100;
-    [SerializeField] int stamina = 100;
-    [SerializeField] int accumulatedDamage = 0;
-    
-    [SerializeField] string currentAction;
-
-    private BehaviourTree behaviourTree;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class Entity : MonoBehaviour
     {
-        Node checkHealth = new Leaf("Health less then 20", new ConditionStrategy(() => health < 20));
-        Node recoverHealth = new Leaf("Recover health", new ActionStrategy(() =>
+        [SerializeField] Task fightTask;
+        [SerializeField] Task manufactorTask;
+        [SerializeField] Task plantTask;
+        [SerializeField] Task healTask;
+        [SerializeField] Task restTask;
+        
+        private NavMeshAgent agent;
+        private AnimatorController animatorController;
+        private BehaviourTree behaviourTree;
+        private SensorTask sensorTask;
+        
+        [SerializeField] private Task currentTask;
+        
+        private void Start()
         {
-            health += 10;
-            stamina -= 5;
-            currentAction = "Recover health";
-        }));
-        
-        Node recoverHealthDelay = new Delay("Recover Health Delay", time: 4);
-        recoverHealthDelay.AddChild(recoverHealth);
-        
-        Node healthSequence = new Sequence("HealthSequence", 3);
-        healthSequence.AddChild(checkHealth);
-        healthSequence.AddChild(recoverHealthDelay);
-        
-        Node checkStamina = new Leaf("Stamina less then 20", new ConditionStrategy(() => stamina < 20));
-        Node recoverStamina = new Leaf("Recover stamina", new ActionStrategy(() =>
+            agent = GetComponent<NavMeshAgent>();
+            animatorController = GetComponent<AnimatorController>();
+            sensorTask = GetComponent<SensorTask>();
+            
+            sensorTask.OnEnterSensor += SensorTask_OnEnterSensor;
+            sensorTask.OnExitSensor += SensorTask_OnExitSensor;
+            
+            Node gotoFight = new Leaf("Go to fight", new GotoDestinationStrategy(agent, fightTask.Waypoint));
+            Node doFight = new Leaf("Do Task fight", new DoTaskStrategy(fightTask));
+            Node sequenceFight = new Sequence("Sequence Fight");
+            sequenceFight.AddChild(gotoFight);
+            sequenceFight.AddChild(doFight);
+            
+            Node gotoManufactor = new Leaf("Go to manufactor", new GotoDestinationStrategy(agent, manufactorTask.Waypoint));
+            Node doManufactor = new Leaf("Do Task manufactor", new DoTaskStrategy(manufactorTask));
+            Node sequenceManufactor = new Sequence("Sequence Manufactor");
+            sequenceManufactor.AddChild(gotoManufactor);
+            sequenceManufactor.AddChild(doManufactor);
+            
+            Node gotoPlant = new Leaf("Go to plant", new GotoDestinationStrategy(agent, plantTask.Waypoint));
+            Node doPlant = new Leaf("Do Task plant", new DoTaskStrategy(plantTask));
+            Node sequencePlant = new Sequence("Sequence Plant");
+            sequencePlant.AddChild(gotoPlant);
+            sequencePlant.AddChild(doPlant);
+            
+            Node gotoHeal = new Leaf("Go to heal", new GotoDestinationStrategy(agent, healTask.Waypoint));
+            Node doHeal = new Leaf("Do Task heal", new DoTaskStrategy(healTask));
+            Node sequenceHeal = new Sequence("Sequence Heal");
+            sequenceHeal.AddChild(gotoHeal);
+            sequenceHeal.AddChild(doHeal);
+            
+            Node gotoRest = new Leaf("Go to rest", new GotoDestinationStrategy(agent, restTask.Waypoint));
+            Node doRest = new Leaf("Do Task rest", new DoTaskStrategy(restTask));
+            Node sequenceRest = new Sequence("Sequence Rest");
+            sequenceRest.AddChild(gotoRest);
+            sequenceRest.AddChild(doRest);
+            
+            Node sequence = new Sequence("Sequence Main");
+            sequence.AddChild(sequenceFight);
+            sequence.AddChild(sequenceManufactor);
+            sequence.AddChild(sequencePlant);
+            sequence.AddChild(sequenceHeal);
+            sequence.AddChild(sequenceRest);
+
+            Node utilFail = new UntilFail("Until Fail");
+            utilFail.AddChild(sequence);
+
+            behaviourTree = new BehaviourTree("Root");
+            behaviourTree.AddChild(utilFail);
+        }
+
+        private void SensorTask_OnEnterSensor(object sender, Task e)
         {
-            currentAction = "Recover stamina";
-            stamina += 5;
-        }));
+            currentTask = e;
+        }
         
-        Node recoverStaminaDelay = new Delay("Recover Stamina Delay", time: 1);
-        recoverStaminaDelay.AddChild(recoverStamina);
-        
-        Node staminaSequence = new Sequence("StaminaSequence", 2);
-        staminaSequence.AddChild(checkStamina);
-        staminaSequence.AddChild(recoverStaminaDelay);
-        
-        Node attack = new Leaf("Attack", new ActionStrategy(() =>
+        private void SensorTask_OnExitSensor(object sender, Task e)
         {
-            currentAction = "Attack";
-            accumulatedDamage += 5;
-            health -= 10;
-            stamina -= 15;
-        }), 1);
-        Node attackDelay = new Delay("Attack Delay", time: 2);
-        attackDelay.AddChild(attack);
+            currentTask = null;
+        }
 
-        Node prioritySelector = new PrioritySelector("Priority Selector");
-        prioritySelector.AddChild(healthSequence);
-        prioritySelector.AddChild(staminaSequence);
-        prioritySelector.AddChild(attackDelay);
-
-        Node utilFail = new UntilFail("Until Fail");
-        utilFail.AddChild(prioritySelector);
-
-        behaviourTree = new BehaviourTree("Root");
-        behaviourTree.AddChild(utilFail);
-    }
-    
-    void Update()
-    {
-        behaviourTree.Process();
+        private void Update()
+        {
+            animatorController.SetSpeed(agent.velocity.magnitude);
+            behaviourTree.Process();
+        }
     }
 }

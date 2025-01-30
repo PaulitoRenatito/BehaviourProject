@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
 
-namespace Task
+namespace Tasks
 {
     public class TaskUI : MonoBehaviour
     {
@@ -27,7 +27,7 @@ namespace Task
 
         private void TaskOnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
         {
-            bool show = e.progressNormalized > 0;
+            bool show = e.progressNormalized > 0 && e.progressNormalized < 0.95f;
 
             if (!show) Visibility.Hide(progressIndicator);
             
