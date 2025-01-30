@@ -13,6 +13,7 @@ namespace Tasks
         [SerializeField] private TaskSO taskSo;
         [SerializeField] private Transform waypoint;
         [SerializeField] private int completed = 0;
+        [SerializeField] private bool debug = false;
         
         public string Name => taskSo.Name;
         public int TimeToComplete => taskSo.TimeToComplete;
@@ -27,14 +28,14 @@ namespace Tasks
             
             timer.OnTimerStart += () =>
             {
-                Debug.Log($"{taskSo.Name} starting...");
+                if (debug) Debug.Log($"{taskSo.Name} starting...");
             };
 
             timer.OnTimerStop += () =>
             {
                 completed++;
                 OnTaskComplete?.Invoke(this, EventArgs.Empty);
-                Debug.Log($"{taskSo.Name} complete!");
+                if (debug) Debug.Log($"{taskSo.Name} complete!");
             };
         }
         
