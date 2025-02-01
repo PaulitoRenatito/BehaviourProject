@@ -17,6 +17,7 @@ namespace Tasks
         
         public string Name => taskSo.Name;
         public int TimeToComplete => taskSo.TimeToComplete;
+        public TaskSO TaskSo => taskSo;
         
         public Transform Waypoint => waypoint;
         
