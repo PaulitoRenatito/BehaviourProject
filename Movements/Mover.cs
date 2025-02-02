@@ -20,8 +20,8 @@ namespace Movements
         
         public NavMeshAgent Agent => agent;
         public bool IsMoving => isMoving;
-        
-        protected virtual void Start()
+
+        private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
         }

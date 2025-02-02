@@ -11,7 +11,8 @@ namespace Entities
     public enum EntityTaskType
     {
         Static,
-        Dynamic
+        Dynamic,
+        Optimal
     }
     
     public class EntityTask : Entity
@@ -30,6 +31,7 @@ namespace Entities
         [SerializeField] private Task currentTask;
         
         private readonly BlackboardTask blackboardTask = new BlackboardTask();
+        public BlackboardTask BlackboardTask => blackboardTask;
         
         private SensorTask sensorTask;
 
@@ -45,6 +47,7 @@ namespace Entities
             behaviourTree = type switch
             {
                 EntityTaskType.Static => TreeFactory.GetStaticTreeTasks(mover.Agent,
+                    blackboardTask,
                     new List<Task>()
                     {
                         fightTask,
@@ -54,6 +57,8 @@ namespace Entities
                         restTask
                     }),
                 EntityTaskType.Dynamic => TreeFactory.GetDynamicTreeTasks(mover.Agent, blackboardTask, fightTask,
+                    manufactorTask, plantTask, healTask, restTask),
+                EntityTaskType.Optimal => TreeFactory.GetOptimalTreeTasks(mover.Agent, blackboardTask, fightTask,
                     manufactorTask, plantTask, healTask, restTask),
                 _ => throw new Exception("Invalid EntityTaskType")
             };

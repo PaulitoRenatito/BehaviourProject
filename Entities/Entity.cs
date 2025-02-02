@@ -8,6 +8,8 @@ namespace Entities
 {
     public class Entity : MonoBehaviour
     {
+        [SerializeField] private string entityName;
+        public string Name => entityName;
         
         protected AnimatorController animatorController;
         protected BehaviourTree behaviourTree;

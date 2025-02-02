@@ -13,6 +13,7 @@ namespace Trees
     {
         public static BehaviourTree GetStaticTreeTasks(
             NavMeshAgent agent,
+            BlackboardTask blackboardTask,
             List<Task> tasks)
         {
             Node sequence = new Sequence("Sequence Main");
@@ -20,7 +21,7 @@ namespace Trees
             foreach (Task task in tasks)
             {
                 Node gotoTask = new Leaf("Go to " + task.Name, new GotoDestinationStrategy(agent, task.Waypoint));
-                Node doTask = new Leaf("Do Task " + task.Name, new DoTaskStrategy(task));
+                Node doTask = new Leaf("Do Task " + task.Name, new DoTaskStrategy(task, blackboardTask));
                 Node sequenceTask = new Sequence("Sequence " + task.Name);
                 sequenceTask.AddChild(gotoTask);
                 sequenceTask.AddChild(doTask);
@@ -28,11 +29,11 @@ namespace Trees
                 sequence.AddChild(sequenceTask);
             }
 
-            Node utilFail = new UntilFail("Until Fail");
-            utilFail.AddChild(sequence);
+            Node untilCondition = new UntilCondition("Until 60 seconds", () => blackboardTask.ElapsedTime >= 60);
+            untilCondition.AddChild(sequence);
 
             BehaviourTree behaviourTree = new BehaviourTree("Root");
-            behaviourTree.AddChild(utilFail);
+            behaviourTree.AddChild(untilCondition);
 
             return behaviourTree;
         }
@@ -112,12 +113,81 @@ namespace Trees
             mainSelector.AddChild(restSequence);
             mainSelector.AddChild(profitableTask);
 
-            Node utilFail = new UntilFail("Until Fail");
-            utilFail.AddChild(mainSelector);
+            Node untilCondition = new UntilCondition("Until 60 seconds", () => blackboardTask.ElapsedTime >= 60);
+            untilCondition.AddChild(mainSelector);
 
             BehaviourTree behaviourTree = new BehaviourTree("Root");
-            behaviourTree.AddChild(utilFail);
+            behaviourTree.AddChild(untilCondition);
 
+            return behaviourTree;
+        }
+
+        public static BehaviourTree GetOptimalTreeTasks(
+            NavMeshAgent agent,
+            BlackboardTask blackboardTask,
+            Task fightTask,
+            Task manufactorTask,
+            Task plantTask,
+            Task healTask,
+            Task restTask
+        )
+        {
+            // Número de Lutar (x1): 0.0
+            // Número de Plantar (x2): 1.0
+            // Número de Fabricar (x3): 10.0
+            // Número de Curar (x4): 0.0
+            // Número de Descansar (x5): 6.0
+            // Lucro total: 180.0
+            
+            // Rest
+            Node restCondition = new Leaf("Check Stamina", new ConditionStrategy(() => blackboardTask.Stamina <= 10));
+            Node gotoRest = new Leaf("Go to Rest", new GotoDestinationStrategy(agent, restTask.Waypoint));
+            Node doRest = new Leaf("Do Rest", new DoTaskStrategy(restTask, blackboardTask));
+            
+            Node restSequence = new Sequence("Sequence Rest");
+            restSequence.AddChild(restCondition);
+            restSequence.AddChild(gotoRest);
+            restSequence.AddChild(doRest);
+            
+            // Plant
+            Node gotoPlant = new Leaf("Go to Plant", new GotoDestinationStrategy(agent, plantTask.Waypoint));
+            Node doPlant = new Leaf("Do Plant", new DoTaskStrategy(plantTask, blackboardTask));
+
+            Node plantSequence = new Sequence("Sequence Plant");
+            plantSequence.AddChild(gotoPlant);
+            plantSequence.AddChild(doPlant);
+            
+            Node plantRepeat = new Repeat("Plant Repeat", 1);
+            plantRepeat.AddChild(plantSequence);
+            
+            // Manufactor
+            Node gotoManufactor = new Leaf("Go to Manufactor",
+                new GotoDestinationStrategy(agent, manufactorTask.Waypoint));
+            Node doManufactor = new Leaf("Do Manufactor", new DoTaskStrategy(manufactorTask, blackboardTask));
+
+            Node manufactorSequence = new Sequence("Sequence Manufactor");
+            manufactorSequence.AddChild(gotoManufactor);
+            manufactorSequence.AddChild(doManufactor);
+            
+            Node manufactorRepeat = new Repeat("Manufactor Repeat", 10);
+            manufactorRepeat.AddChild(manufactorSequence);
+            
+            // Profitable Tasks
+            Node profitableTask = new Selector("Selector Profitable Task");
+            profitableTask.AddChild(plantRepeat);
+            profitableTask.AddChild(manufactorRepeat);
+            
+            // Main Selector
+            Node mainSelector = new Selector("Main Root");
+            mainSelector.AddChild(restSequence);
+            mainSelector.AddChild(profitableTask);
+            
+            Node untilCondition = new UntilCondition("Until 60 seconds", () => blackboardTask.ElapsedTime >= 60);
+            untilCondition.AddChild(mainSelector);
+            
+            BehaviourTree behaviourTree = new BehaviourTree("Root");
+            behaviourTree.AddChild(untilCondition);
+            
             return behaviourTree;
         }
 
