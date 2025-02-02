@@ -59,8 +59,8 @@ namespace Behaviour.Strategies
                     blackboardTask.Profit += task.TaskSo.Profit;
                     blackboardTask.ElapsedTime += task.TimeToComplete;
                     
-                    Debug.Log(
-                        $"Task: {task.Name} | Lucro: {blackboardTask.Profit} | Vida: {blackboardTask.Health} | Stamina: {blackboardTask.Stamina} | Tempo: {blackboardTask.ElapsedTime}");
+                    // Debug.Log(
+                    //     $"Task: {task.Name} | Lucro: {blackboardTask.Profit} | Vida: {blackboardTask.Health} | Stamina: {blackboardTask.Stamina} | Tempo: {blackboardTask.ElapsedTime}");
                 }
 
                 status = Node.Status.Success;

@@ -18,14 +18,14 @@ namespace Behaviour.Nodes
             {
                 status = Status.Running;
                 counter++;
-                Debug.Log($"Start: {name} - {counter}");
+                //Debug.Log($"Start: {name} - {counter}");
             };
 
             timer.OnTimerStop += () =>
             {
                 Reset();
                 status = children[0].Process();
-                Debug.Log($"Finished: {name} - {counter}");
+                //Debug.Log($"Finished: {name} - {counter}");
             };
         }
 

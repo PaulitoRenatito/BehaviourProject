@@ -45,6 +45,13 @@ namespace Entities
         private void OnEnable()
         {
             soundPlayer?.Stop();
+            behaviourTree?.Reset();
+        }
+
+        private void OnDisable()
+        {
+            soundPlayer?.Stop();
+            behaviourTree?.Reset();
         }
 
         protected virtual void Update()

@@ -32,7 +32,7 @@ namespace Tasks
 
         private void Task_OnTaskStart(object sender, EventArgs e)
         {
-            Debug.Log("Task_OnTaskStart");
+            //Debug.Log("Task_OnTaskStart");
             soundPlayer.PlayLoop(task.TaskSo.TimeToComplete);
         }
         
