@@ -52,5 +52,13 @@ namespace Behaviour.Blackboard
             get => elapsedTime;
             set => elapsedTime = value;
         }
+        
+        public void Reset()
+        {
+            health = 100;
+            stamina = 100;
+            profit = 0;
+            elapsedTime = 0;
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,6 +28,8 @@ namespace Entities
             healthBarImage.fillAmount = 1f;
             staminaBarImage.fillAmount = 1f;
             currencyText.text = "0";
+            
+            GameManager.Instance.OnReset += GameManager_OnReset;
         }
 
         private void EntityOnHealthChanged(object sender, float e)
@@ -41,6 +45,13 @@ namespace Entities
         private void EntityOnCurrencyChanged(object sender, int e)
         {
             currencyText.text = e.ToString();
+        }
+        
+        private void GameManager_OnReset(object sender, EventArgs e)
+        {
+            healthBarImage.fillAmount = 1f;
+            staminaBarImage.fillAmount = 1f;
+            currencyText.text = "0";
         }
     }
 }

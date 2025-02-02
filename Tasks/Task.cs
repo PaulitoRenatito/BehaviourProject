@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using Sensor;
 using UnityEngine;
 using Utilities;
@@ -13,7 +14,6 @@ namespace Tasks
         
         [SerializeField] private TaskSO taskSo;
         [SerializeField] private Transform waypoint;
-        [SerializeField] private int completed = 0;
         [SerializeField] private bool debug = false;
         
         public string Name => taskSo.Name;
@@ -36,12 +36,13 @@ namespace Tasks
 
             timer.OnTimerStop += () =>
             {
-                completed++;
                 OnTaskComplete?.Invoke(this, EventArgs.Empty);
                 if (debug) Debug.Log($"{taskSo.Name} complete!");
             };
+            
+            GameManager.Instance.OnReset += GameManager_OnReset;
         }
-        
+
         public void StartTask()
         {
             if (!timer.IsRunning)
@@ -64,6 +65,11 @@ namespace Tasks
         public Transform GetTransform()
         {
             return this.transform;
+        }
+        
+        private void GameManager_OnReset(object sender, EventArgs e)
+        {
+            timer.Stop();
         }
     }
 }

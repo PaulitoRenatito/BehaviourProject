@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -25,7 +26,12 @@ namespace Movements
         {
             agent = GetComponent<NavMeshAgent>();
         }
-        
+
+        private void Start()
+        {
+            GameManager.Instance.OnReset += GameManager_OnReset;
+        }
+
         protected virtual void Update()
         {
             float speed = agent.velocity.magnitude;
@@ -38,7 +44,7 @@ namespace Movements
                 direction = agent.velocity.normalized,
                 speedNormalized = mappedSpeed
             });
-
+            
             switch (isMoving)
             {
                 case false when mappedSpeed > 0.01f:
@@ -50,6 +56,11 @@ namespace Movements
                     OnMovementChange?.Invoke(this, isMoving);
                     break;
             }
+        }
+        
+        private void GameManager_OnReset(object sender, EventArgs e)
+        {
+            agent?.ResetPath();
         }
     }
 }

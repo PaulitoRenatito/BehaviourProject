@@ -1,6 +1,7 @@
 using System;
 using Animations;
 using Behaviour;
+using Managers;
 using Movements;
 using Sounds;
 using UnityEngine;
@@ -35,11 +36,36 @@ namespace Entities
             {
                 animatorController.SetSpeed(args.speedNormalized);
             };
+            
+            GameManager.Instance.OnReset += GameManager_OnReset;
+            GameManager.Instance.OnPause += GameManager_OnPause;
+            soundPlayer?.Stop();
+        }
+
+        private void OnEnable()
+        {
+            soundPlayer?.Stop();
         }
 
         protected virtual void Update()
         {
             behaviourTree.Process();
+        }
+        
+        private void GameManager_OnReset(object sender, EventArgs e)
+        {
+            Reset();
+        }
+
+        protected virtual void Reset()
+        {
+            soundPlayer?.Stop();
+            behaviourTree?.Reset();
+        }
+        
+        private void GameManager_OnPause(object sender, EventArgs e)
+        {
+            soundPlayer?.Stop();
         }
     }
 }

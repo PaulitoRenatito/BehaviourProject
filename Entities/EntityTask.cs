@@ -27,27 +27,12 @@ namespace Entities
         [Header("Type")]
         [SerializeField] private EntityTaskType type;
         
-        [Header("Debug")]
-        [SerializeField] private Task currentTask;
-        
         private readonly BlackboardTask blackboardTask = new BlackboardTask();
         public BlackboardTask BlackboardTask => blackboardTask;
-        
-        private SensorTask sensorTask;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            
-            sensorTask = GetComponent<SensorTask>();
-        }
 
         protected override void Start()
         {
             base.Start();
-
-            sensorTask.OnEnterSensor += SensorTask_OnEnterSensor;
-            sensorTask.OnExitSensor += SensorTask_OnExitSensor;
 
             behaviourTree = type switch
             {
@@ -68,15 +53,11 @@ namespace Entities
                 _ => throw new Exception("Invalid EntityTaskType")
             };
         }
-        
-        private void SensorTask_OnEnterSensor(object sender, Task e)
-        {
-            currentTask = e;
-        }
 
-        private void SensorTask_OnExitSensor(object sender, Task e)
+        protected override void Reset()
         {
-            currentTask = null;
+            base.Reset();
+            blackboardTask?.Reset();
         }
     }
 }

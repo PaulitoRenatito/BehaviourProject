@@ -1,3 +1,5 @@
+using System;
+using Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +25,8 @@ namespace Tasks
             barImage.fillAmount = 0f;
 
             Visibility.Hide(progressIndicator);
+            
+            GameManager.Instance.OnReset += GameManager_OnReset;
         }
 
         private void TaskOnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
@@ -37,6 +41,13 @@ namespace Tasks
             
             Visibility.Show(progressIndicator);
             barImage.fillAmount = e.progressNormalized;
+        }
+        
+        private void GameManager_OnReset(object sender, EventArgs e)
+        {
+            barImage.fillAmount = 0f;
+
+            Visibility.Hide(progressIndicator);
         }
     }
 }
