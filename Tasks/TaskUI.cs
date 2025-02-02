@@ -27,9 +27,13 @@ namespace Tasks
 
         private void TaskOnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
         {
-            bool show = e.progressNormalized > 0 && e.progressNormalized < 0.95f;
+            bool show = e.progressNormalized > 0 && e.progressNormalized < 0.99f;
 
-            if (!show) Visibility.Hide(progressIndicator);
+            if (!show)
+            {
+                Visibility.Hide(progressIndicator);
+                return;
+            }
             
             Visibility.Show(progressIndicator);
             barImage.fillAmount = e.progressNormalized;
