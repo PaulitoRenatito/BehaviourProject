@@ -1,3 +1,4 @@
+using System;
 using Animations;
 using Behaviour;
 using Movements;
@@ -17,11 +18,14 @@ namespace Entities
         protected Mover mover;
         [SerializeField] private SoundPlayer soundPlayer;
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             animatorController = GetComponent<AnimatorController>();
             mover = GetComponent<Mover>();
-            
+        }
+
+        protected virtual void Start()
+        {
             mover.OnMovementChange += (sender, isMoving) =>
             {
                 if (isMoving) soundPlayer.PlayLoop();

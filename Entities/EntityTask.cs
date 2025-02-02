@@ -35,11 +35,16 @@ namespace Entities
         
         private SensorTask sensorTask;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            sensorTask = GetComponent<SensorTask>();
+        }
+
         protected override void Start()
         {
             base.Start();
-            
-            sensorTask = GetComponent<SensorTask>();
 
             sensorTask.OnEnterSensor += SensorTask_OnEnterSensor;
             sensorTask.OnExitSensor += SensorTask_OnExitSensor;
