@@ -1,26 +1,38 @@
 using Animations;
 using Behaviour;
+using Movements;
+using Sounds;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Entities
 {
     public class Entity : MonoBehaviour
     {
-
-        protected NavMeshAgent agent;
+        
         protected AnimatorController animatorController;
         protected BehaviourTree behaviourTree;
 
+        protected Mover mover;
+        [SerializeField] private SoundPlayer soundPlayer;
+
         protected virtual void Start()
         {
-            agent = GetComponent<NavMeshAgent>();
             animatorController = GetComponent<AnimatorController>();
+            mover = GetComponent<Mover>();
+            
+            mover.OnMovementChange += (sender, isMoving) =>
+            {
+                if (isMoving) soundPlayer.PlayLoop();
+                else soundPlayer.Stop();
+            };
+            mover.OnMove += (sender, args) =>
+            {
+                animatorController.SetSpeed(args.speedNormalized);
+            };
         }
 
         protected virtual void Update()
         {
-            animatorController.SetSpeed(agent.velocity.magnitude);
             behaviourTree.Process();
         }
     }

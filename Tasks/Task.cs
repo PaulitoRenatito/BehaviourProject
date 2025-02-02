@@ -8,6 +8,7 @@ namespace Tasks
     public class Task : MonoBehaviour, IHasProgress, ISensorable
     {
         public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
+        public event EventHandler OnTaskStart;
         public event EventHandler OnTaskComplete;
         
         [SerializeField] private TaskSO taskSo;
@@ -29,6 +30,7 @@ namespace Tasks
             
             timer.OnTimerStart += () =>
             {
+                OnTaskStart?.Invoke(this, EventArgs.Empty);
                 if (debug) Debug.Log($"{taskSo.Name} starting...");
             };
 

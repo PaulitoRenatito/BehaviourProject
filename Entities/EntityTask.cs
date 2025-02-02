@@ -44,7 +44,7 @@ namespace Entities
 
             behaviourTree = type switch
             {
-                EntityTaskType.Static => TreeFactory.GetStaticTreeTasks(agent,
+                EntityTaskType.Static => TreeFactory.GetStaticTreeTasks(mover.Agent,
                     new List<Task>()
                     {
                         fightTask,
@@ -53,7 +53,7 @@ namespace Entities
                         healTask,
                         restTask
                     }),
-                EntityTaskType.Dynamic => TreeFactory.GetDynamicTreeTasks(agent, blackboardTask, fightTask,
+                EntityTaskType.Dynamic => TreeFactory.GetDynamicTreeTasks(mover.Agent, blackboardTask, fightTask,
                     manufactorTask, plantTask, healTask, restTask),
                 _ => throw new Exception("Invalid EntityTaskType")
             };
