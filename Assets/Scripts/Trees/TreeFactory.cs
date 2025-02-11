@@ -21,7 +21,13 @@ namespace Trees
             foreach (Task task in tasks)
             {
                 Node gotoTask = new Leaf("Go to " + task.Name, new GotoDestinationStrategy(agent, task.Waypoint));
-                Node doTask = new Leaf("Do Task " + task.Name, new DoTaskStrategy(task, blackboardTask));
+                Node doTask = new Leaf("Do Task " + task.Name, new DoTaskStrategy(task, () =>
+                {
+                    blackboardTask.Health += task.TaskSo.Health;
+                    blackboardTask.Stamina += task.TaskSo.Stamina;
+                    blackboardTask.Profit += task.TaskSo.Profit;
+                    blackboardTask.ElapsedTime += task.TimeToComplete;
+                }));
                 Node sequenceTask = new Sequence("Sequence " + task.Name);
                 sequenceTask.AddChild(gotoTask);
                 sequenceTask.AddChild(doTask);
@@ -51,7 +57,13 @@ namespace Trees
             // Heal
             Node healCondition = new Leaf("Check Health", new ConditionStrategy(() => blackboardTask.Health <= 20));
             Node gotoHeal = new Leaf("Go to Heal", new GotoDestinationStrategy(agent, healTask.Waypoint));
-            Node doHeal = new Leaf("Do Heal", new DoTaskStrategy(healTask, blackboardTask));
+            Node doHeal = new Leaf("Do Heal", new DoTaskStrategy(healTask, () =>
+            {
+                blackboardTask.Health += healTask.TaskSo.Health;
+                blackboardTask.Stamina += healTask.TaskSo.Stamina;
+                blackboardTask.Profit += healTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += healTask.TimeToComplete;
+            }));
 
             Node healSequence = new Sequence("Sequence Heal");
             healSequence.AddChild(healCondition);
@@ -61,7 +73,13 @@ namespace Trees
             // Rest
             Node restCondition = new Leaf("Check Stamina", new ConditionStrategy(() => blackboardTask.Stamina <= 15));
             Node gotoRest = new Leaf("Go to Rest", new GotoDestinationStrategy(agent, restTask.Waypoint));
-            Node doRest = new Leaf("Do Rest", new DoTaskStrategy(restTask, blackboardTask));
+            Node doRest = new Leaf("Do Rest", new DoTaskStrategy(restTask, () =>
+            {
+                blackboardTask.Health += restTask.TaskSo.Health;
+                blackboardTask.Stamina += restTask.TaskSo.Stamina;
+                blackboardTask.Profit += restTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += restTask.TimeToComplete;
+            }));
 
             Node restSequence = new Sequence("Sequence Rest");
             restSequence.AddChild(restCondition);
@@ -72,7 +90,13 @@ namespace Trees
             Node fightCondition = new Leaf("Can Fight",
                 new ConditionStrategy(() => blackboardTask.Health >= 40 && blackboardTask.Stamina > 25));
             Node gotoFight = new Leaf("Go to Fight", new GotoDestinationStrategy(agent, fightTask.Waypoint));
-            Node doFight = new Leaf("Do Fight", new DoTaskStrategy(fightTask, blackboardTask));
+            Node doFight = new Leaf("Do Fight", new DoTaskStrategy(fightTask, () =>
+            {
+                blackboardTask.Health += fightTask.TaskSo.Health;
+                blackboardTask.Stamina += fightTask.TaskSo.Stamina;
+                blackboardTask.Profit += fightTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += fightTask.TimeToComplete;
+            }));
 
             Node fightSequence = new Sequence("Sequence Fight");
             fightSequence.AddChild(fightCondition);
@@ -84,7 +108,13 @@ namespace Trees
                 new ConditionStrategy(() => blackboardTask.Stamina > 5 && (60 - blackboardTask.ElapsedTime) >= 5));
             Node gotoManufactor = new Leaf("Go to Manufactor",
                 new GotoDestinationStrategy(agent, manufactorTask.Waypoint));
-            Node doManufactor = new Leaf("Do Manufactor", new DoTaskStrategy(manufactorTask, blackboardTask));
+            Node doManufactor = new Leaf("Do Manufactor", new DoTaskStrategy(manufactorTask, () =>
+            {
+                blackboardTask.Health += manufactorTask.TaskSo.Health;
+                blackboardTask.Stamina += manufactorTask.TaskSo.Stamina;
+                blackboardTask.Profit += manufactorTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += manufactorTask.TimeToComplete;
+            }));
 
             Node manufactorSequence = new Sequence("Sequence Manufactor");
             manufactorSequence.AddChild(manufactorCondition);
@@ -95,7 +125,13 @@ namespace Trees
             Node plantCondition = new Leaf("Can Plant",
                 new ConditionStrategy(() => blackboardTask.Stamina > 10 && (60 - blackboardTask.ElapsedTime) >= 4));
             Node gotoPlant = new Leaf("Go to Plant", new GotoDestinationStrategy(agent, plantTask.Waypoint));
-            Node doPlant = new Leaf("Do Plant", new DoTaskStrategy(plantTask, blackboardTask));
+            Node doPlant = new Leaf("Do Plant", new DoTaskStrategy(plantTask, () =>
+            {
+                blackboardTask.Health += plantTask.TaskSo.Health;
+                blackboardTask.Stamina += plantTask.TaskSo.Stamina;
+                blackboardTask.Profit += plantTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += plantTask.TimeToComplete;
+            }));
 
             Node plantSequence = new Sequence("Sequence Plant");
             plantSequence.AddChild(plantCondition);
@@ -142,7 +178,13 @@ namespace Trees
             // Rest
             Node restCondition = new Leaf("Check Stamina", new ConditionStrategy(() => blackboardTask.Stamina <= 10));
             Node gotoRest = new Leaf("Go to Rest", new GotoDestinationStrategy(agent, restTask.Waypoint));
-            Node doRest = new Leaf("Do Rest", new DoTaskStrategy(restTask, blackboardTask));
+            Node doRest = new Leaf("Do Rest", new DoTaskStrategy(restTask, () =>
+            {
+                blackboardTask.Health += restTask.TaskSo.Health;
+                blackboardTask.Stamina += restTask.TaskSo.Stamina;
+                blackboardTask.Profit += restTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += restTask.TimeToComplete;
+            }));
             
             Node restSequence = new Sequence("Sequence Rest");
             restSequence.AddChild(restCondition);
@@ -151,7 +193,13 @@ namespace Trees
             
             // Plant
             Node gotoPlant = new Leaf("Go to Plant", new GotoDestinationStrategy(agent, plantTask.Waypoint));
-            Node doPlant = new Leaf("Do Plant", new DoTaskStrategy(plantTask, blackboardTask));
+            Node doPlant = new Leaf("Do Plant", new DoTaskStrategy(plantTask, () =>
+            {
+                blackboardTask.Health += plantTask.TaskSo.Health;
+                blackboardTask.Stamina += plantTask.TaskSo.Stamina;
+                blackboardTask.Profit += plantTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += plantTask.TimeToComplete;
+            }));
 
             Node plantSequence = new Sequence("Sequence Plant");
             plantSequence.AddChild(gotoPlant);
@@ -163,7 +211,13 @@ namespace Trees
             // Manufactor
             Node gotoManufactor = new Leaf("Go to Manufactor",
                 new GotoDestinationStrategy(agent, manufactorTask.Waypoint));
-            Node doManufactor = new Leaf("Do Manufactor", new DoTaskStrategy(manufactorTask, blackboardTask));
+            Node doManufactor = new Leaf("Do Manufactor", new DoTaskStrategy(manufactorTask, () =>
+            {
+                blackboardTask.Health += manufactorTask.TaskSo.Health;
+                blackboardTask.Stamina += manufactorTask.TaskSo.Stamina;
+                blackboardTask.Profit += manufactorTask.TaskSo.Profit;
+                blackboardTask.ElapsedTime += manufactorTask.TimeToComplete;
+            }));
 
             Node manufactorSequence = new Sequence("Sequence Manufactor");
             manufactorSequence.AddChild(gotoManufactor);

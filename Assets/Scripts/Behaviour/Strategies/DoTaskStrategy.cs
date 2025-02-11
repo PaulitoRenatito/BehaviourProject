@@ -1,4 +1,4 @@
-using Behaviour.Blackboard;
+using System;
 using Behaviour.Nodes;
 using Tasks;
 using UnityEngine;
@@ -9,15 +9,15 @@ namespace Behaviour.Strategies
     public class DoTaskStrategy : IStrategy
     {
         private readonly Task task;
-        private readonly BlackboardTask blackboardTask;
+        private readonly Action onCompleteAction;
         private Timer timer;
 
         private Node.Status status = Node.Status.Running;
 
-        public DoTaskStrategy(Task task, BlackboardTask blackboardTask = null)
+        public DoTaskStrategy(Task task, Action onCompleteAction = null)
         {
             this.task = task;
-            if (blackboardTask != null) this.blackboardTask = blackboardTask;
+            this.onCompleteAction = onCompleteAction;
             InitializeTimer();
         }
 
@@ -52,16 +52,7 @@ namespace Behaviour.Strategies
             };
             timer.OnTimerStop += () =>
             {
-                if (blackboardTask != null)
-                {
-                    blackboardTask.Health += task.TaskSo.Health;
-                    blackboardTask.Stamina += task.TaskSo.Stamina;
-                    blackboardTask.Profit += task.TaskSo.Profit;
-                    blackboardTask.ElapsedTime += task.TimeToComplete;
-                    
-                    // Debug.Log(
-                    //     $"Task: {task.Name} | Lucro: {blackboardTask.Profit} | Vida: {blackboardTask.Health} | Stamina: {blackboardTask.Stamina} | Tempo: {blackboardTask.ElapsedTime}");
-                }
+                onCompleteAction?.Invoke();
 
                 status = Node.Status.Success;
             };
